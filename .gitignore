@@ -104,8 +104,11 @@ dist
 .tern-port
 
 # JetBrains locally configuration files
-.idea
+.idea/
 
 # NPM/YARN lock file
 *.lock
 *lock*
+
+# built files
+lib/
