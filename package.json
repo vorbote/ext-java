@@ -1,11 +1,11 @@
 {
-  "name": "vorbote-utils",
-  "version": "1.0.1",
+  "name": "ext-java",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "rm lib/* -r && tsc",
+    "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "yarn build",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vorbote/vorbote-utils.git"
+    "url": "git+https://github.com/vorbote/ext-java.git"
   },
   "author": {
     "name": "vorbote",
@@ -24,9 +24,9 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/vorbote/vorbote-utils/issues"
+    "url": "https://github.com/vorbote/ext-java/issues"
   },
-  "homepage": "https://github.com/vorbote/vorbote-utils#readme",
+  "homepage": "https://github.com/vorbote/ext-java#readme",
   "dependencies": {
     "@types/jest": "^27.4.1",
     "jest": "27",

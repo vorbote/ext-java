@@ -1,4 +1,5 @@
-import {NoSuchElementException} from "../exceptions/NoSuchElementException";
+import {NoSuchElementException} from '../exceptions/NoSuchElementException'
+import {Objects} from './Objects'
 
 /**
  * A container object which may or may not contain a non-null value.
@@ -18,10 +19,10 @@ import {NoSuchElementException} from "../exceptions/NoSuchElementException";
  */
 export class Optional<T> {
 
-  private static readonly EMPTY: Optional<any> = new Optional<any>();
+  private static readonly EMPTY: Optional<any> = new Optional<any>(null)
   private readonly value: T | null
 
-  private constructor(value?: T) {
+  private constructor(value: T | null) {
     if (value) {
       this.value = value
     } else
@@ -45,8 +46,8 @@ export class Optional<T> {
    * @return an {@code Optional} with the value present
    * @throws NullPointerException if value is null
    */
-  public static of<T>(value: T): Optional<T> {
-    return new Optional(value)
+  public static of<T>(value: T | null): Optional<T> {
+    return new Optional(Objects.requireNonNull(value))
   }
 
   /**
@@ -70,7 +71,7 @@ export class Optional<T> {
    */
   public get(): T {
     if (this.value == null) {
-      throw new NoSuchElementException("No value present.")
+      throw new NoSuchElementException('No value present.')
     }
     return this.value
   }
@@ -85,16 +86,53 @@ export class Optional<T> {
   }
 
   /**
+   * If a value is not present, returns <code>true</code>, otherwise false.
+   *
+   * @returns {boolean} <code>true</code> if a value is not present,
+   * otherwise false.
+   */
+  public isEmpty(): boolean {
+    return this.value == null
+  }
+
+  /**
    * If a value is present, invoke the specified consumer with the value,
    * otherwise do nothing.
    *
-   * @param callback block to be executed if a value is present
+   * @param action block to be executed if a value is present
    * @throws NullPointerException if value is present and callback is
    * null
    */
-  public ifPresent(callback: (param: T) => void): void {
+  public ifPresent(action: Consumer<T>): void {
     if (this.value != null) {
-      callback(this.value)
+      action(this.value)
+    }
+  }
+
+  /**
+   * If a value is present, performs the given action with the value,
+   * otherwise performs the given empty-based action.
+   *
+   * @param {Consumer<T>} action the action to be performed, if a
+   * value is present
+   * @param {Runnable} actionOnEmpty the empty-based action to be
+   * performed, if no value is present
+   *
+   */
+  public ifPresentOrElse(action: Consumer<T>, actionOnEmpty: Runnable) {
+    if (this.value != null) {
+      action(this.value)
+    } else {
+      actionOnEmpty()
+    }
+  }
+
+  public filter(predicate: Predict<T>): Optional<Nullable<T>> {
+    Objects.requireNonNull(predicate)
+    if (!this.isPresent()) {
+      return this
+    } else {
+      return predicate(this.value) ? this : Optional.empty()
     }
   }
 
@@ -109,11 +147,29 @@ export class Optional<T> {
    * otherwise an empty {@code Optional}
    * @throws NullPointerException if the mapping function is null
    */
-  public map<U>(callback: (param: T) => U): Optional<U> {
+  public map<U>(callback: Func<T, U>): Optional<Nullable<U>> {
     if (this.value == null) {
       return Optional.empty()
     } else {
       return Optional.ofNullable(callback(this.value))
+    }
+  }
+
+  public flatMap<U>(mapper: Func<T, Optional<Nullable<U>>>): Optional<Nullable<U>> {
+    Objects.requireNonNull(mapper)
+    if (!this.isPresent()) {
+      return Optional.empty()
+    } else {
+      return Objects.requireNonNull(mapper(this.value))
+    }
+  }
+
+  public or(supplier: Supplier<Optional<T>>): Optional<T> {
+    Objects.requireNonNull(supplier)
+    if (!this.isPresent())
+      return this
+    else {
+      return Objects.requireNonNull(supplier())
     }
   }
 
@@ -125,7 +181,26 @@ export class Optional<T> {
    * @return the value, if present, otherwise other
    */
   public orElse(other: T): T {
-    return this.value != null ? this.value : other;
+    return this.value != null ? this.value : other
+  }
+
+  public orElseGet(supplier: Supplier<T>): T {
+    return this.value != null ? this.value : Objects.requireNonNull(supplier())
+  }
+
+  public orElseThrow(): T {
+    if (this.value == null) {
+      throw new NoSuchElementException('No value present')
+    }
+    return this.value
+  }
+
+  public orElseThrowSpecified<E extends Error>(supplier: Supplier<E>): T {
+    if (this.value != null) {
+      return this.value
+    } else {
+      throw supplier()
+    }
   }
 
 }

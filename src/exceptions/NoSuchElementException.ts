@@ -1,5 +1,5 @@
 /**
- * NoSuchElementException means the valus is null.
+ * NoSuchElementException means the value is null.
  */
 export class NoSuchElementException extends Error {
 
